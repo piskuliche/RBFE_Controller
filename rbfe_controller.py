@@ -649,13 +649,16 @@ class RBFE_Analysis:
         return 
     def grab_data_lines(self):
         print("Grabbing data lines")
+        if self.output_dir/"logs" is not None:
+            shutil.rmtree(self.output_dir/"logs")
+        (self.output_dir/"logs").mkdir(parents=True, exist_ok=True)
         for edge in self.calculation.edges:
             for sim_sys in ["aq", "com"]:
                 for trial in self.trials:
                     analysis_dir = self.output_dir / "data"/ edge.name / sim_sys / f"{trial}"
                     if not analysis_dir.exists():
                         analysis_dir.mkdir(parents=True, exist_ok=True)
-                    line=f"edgembar-amber2dats.py -r {edge.path}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge.path}/{sim_sys}/t{trial}/*ti.mdout)\n"
+                    line=f"edgembar-amber2dats.py -r {edge.path}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge.path}/{sim_sys}/t{trial}/*ti.mdout) > {self.output_dir}/logs/{edge.name}_{sim_sys}_t{trial}.log &\n"
                     self.analysis_lines.append(line)
         return
     def discover_edges(self):
