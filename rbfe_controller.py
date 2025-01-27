@@ -648,6 +648,7 @@ class RBFE_Analysis:
 
         return 
     def grab_data_lines(self):
+        print("Grabbing data lines")
         for edge in self.calculation.edges:
             for sim_sys in ["aq", "com"]:
                 for trial in self.trials:
