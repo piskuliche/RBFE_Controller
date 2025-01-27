@@ -650,7 +650,8 @@ class RBFE_Analysis:
     def grab_data_lines(self):
         for edge in self.calculation.edges:
             for trial in self.trials:
-                line=f"edgembar-amber2dats.py -r {edge.com}/remt{trial}.log --odir={self.output_dir}/data $(ls {edge.com}/t{trial}/*ti.mdout)\n"
+                analysis_dir = self.output_dir / edge.name / f"{trial}"
+                line=f"edgembar-amber2dats.py -r {edge.com}/remt{trial}.log --odir={analysis_dir}/data $(ls {edge.com}/t{trial}/*ti.mdout)\n"
                 self.analysis_lines.append(line)
         return
     def discover_edges(self):
