@@ -654,7 +654,7 @@ class RBFE_Analysis:
                     analysis_dir = self.output_dir / "data"/ edge.name / sim_sys / f"{trial}"
                     if not analysis_dir.exists():
                         analysis_dir.mkdir(parents=True, exist_ok=True)
-                    line=f"edgembar-amber2dats.py -r {edge}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge}/{sim_sys}/t{trial}/*ti.mdout)\n"
+                    line=f"edgembar-amber2dats.py -r {edge.path}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge.path}/{sim_sys}/t{trial}/*ti.mdout)\n"
                     self.analysis_lines.append(line)
         return
     def discover_edges(self):
