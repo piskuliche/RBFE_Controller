@@ -749,7 +749,7 @@ if __name__ == "__main__":
             print("Apply Reference Structures")
             rmsd.ApplyReferenceToSystem(args.rmsd)
     else:
-        analysis = RBFE_Analysis(args.sys, trials=[1,2,3], num_threads=56)
+        analysis = RBFE_Analysis(args.sys, trials=[1,2,3], num_threads=56, output_dir=args.analysis)
         analysis.grab_data_lines()
         analysis.discover_edges()
         analysis.write_edgembar()
