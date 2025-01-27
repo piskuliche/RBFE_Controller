@@ -651,6 +651,8 @@ class RBFE_Analysis:
         for edge in self.calculation.edges:
             for trial in self.trials:
                 analysis_dir = self.output_dir / edge.name / f"{trial}"
+                if not analysis_dir.exists():
+                    analysis_dir.mkdir(parents=True, exist_ok=True)
                 line=f"edgembar-amber2dats.py -r {edge.com}/remt{trial}.log --odir={analysis_dir}/data $(ls {edge.com}/t{trial}/*ti.mdout)\n"
                 self.analysis_lines.append(line)
         return
