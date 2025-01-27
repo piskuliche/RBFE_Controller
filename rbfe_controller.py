@@ -662,6 +662,9 @@ class RBFE_Analysis:
                     line=f"edgembar-amber2dats.py -r {edge.path}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge.path}/{sim_sys}/t{trial}/*ti.mdout) > {self.output_dir}/logs/{edge.name}_{sim_sys}_t{trial}.log 2>&1 &\n"
                     self.analysis_lines.append(line)
         self.analysis_lines.append("wait\n")
+        self.analysis_lines.append(f"Errors below this line:\n")
+        self.analysis_lines.append(f"grep 'Traceback' {self.output_dir}/logs/*\n")
+        self.analysis_lines.append(f"End of Errors\n")
         return
     def discover_edges(self):
         lines="""
