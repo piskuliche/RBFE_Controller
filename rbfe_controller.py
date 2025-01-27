@@ -649,6 +649,7 @@ class RBFE_Analysis:
         return 
     def grab_data_lines(self):
         print("Grabbing data lines")
+        (self.output_dir/"logs").mkdir(parents=True, exist_ok=True)
         if self.output_dir/"logs" is not None:
             shutil.rmtree(self.output_dir/"logs")
         (self.output_dir/"logs").mkdir(parents=True, exist_ok=True)
