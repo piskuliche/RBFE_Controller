@@ -633,14 +633,14 @@ class ApplyRMSRestraints:
 
 
 class RBFE_Analysis:
-    def __init__(self, system, trials=[1], output_dir="RBFE_Analysis", subdir="analysis", num_threads=12):
+    def __init__(self, system, trials=[1], output_dir="RBFE_Analysis", subdir="analysis", num_threads=12, toolkit_bin="./"):
         self.trials=trials
         self.output_dir = Path(output_dir)
         self.subdir = self.output_dir / subdir
         self.calculation = Calculation(system)
         self.calculation.find_edges()
         self.num_threads = num_threads
-        self.analysis_lines = []
+        self.analysis_lines = [f"export PATH={toolkit_bin}/bin:$PATH\n", f"export PYTHONPATH={toolkit_bin}/lib/python3.11/site-packages/:$PYTHONPATH\n"]
         if not self.output_dir.exists():
             self.output_dir.mkdir(parents=True, exist_ok=True)
         if not self.subdir.exists():
@@ -727,7 +727,20 @@ if __name__ == "__main__":
     parser.add_argument("-new_params", default=None, type=str, help="The new parameters to use in the mdin files")
     parser.add_argument("-rmsd", default=None, type=str, help="The original system to use for RMSD restraints")
     parser.add_argument("-analysis", default="false", type=str, help="Whether to run the analysis")
+    parser.add_argument('-toolkit_bin', type=str, help="The path to the toolkit binaries")
     args = parser.parse_args()
+
+    if args.toolkit_bin is not None:
+        with open('toolkit_bin.info','w') as f:
+            f.write(args.toolkit_bin)
+    
+    if Path("toolkit_bin.info").exists():
+        with open('toolkit_bin.info','r') as f:
+            toolkit_bin = f.read().strip()
+    else:
+        toolkit_bin = "./"
+    
+
     
     if args.analysis == "false":
         system = Calculation(args.sys)
@@ -749,7 +762,7 @@ if __name__ == "__main__":
             print("Apply Reference Structures")
             rmsd.ApplyReferenceToSystem(args.rmsd)
     else:
-        analysis = RBFE_Analysis(args.sys, trials=[1,2,3], num_threads=56, output_dir=args.analysis)
+        analysis = RBFE_Analysis(args.sys, trials=[1,2,3], num_threads=56, output_dir=args.analysis, toolkit_bin=toolkit_bin)
         analysis.grab_data_lines()
         analysis.discover_edges()
         analysis.write_edgembar()
