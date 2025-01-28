@@ -662,9 +662,9 @@ class RBFE_Analysis:
                     line=f"edgembar-amber2dats.py -r {edge.path}/{sim_sys}/remt{trial}.log --odir={analysis_dir} $(ls {edge.path}/{sim_sys}/t{trial}/*ti.mdout) > {self.output_dir}/logs/{edge.name}_{sim_sys}_t{trial}.log 2>&1 &\n"
                     self.analysis_lines.append(line)
         self.analysis_lines.append("wait\n")
-        self.analysis_lines.append(f"Errors below this line:\n")
+        self.analysis_lines.append(f"echo 'Errors below this line:'\n")
         self.analysis_lines.append(f"grep 'Traceback' {self.output_dir}/logs/*\n")
-        self.analysis_lines.append(f"End of Errors\n")
+        self.analysis_lines.append(f"echo 'End of Errors'\n")
         return
     def discover_edges(self):
         lines="""
@@ -698,7 +698,7 @@ for edge in edges:
             self.analysis_lines.append(line)
         return
     def write_finalize(self):
-        line = f"edgembar-WriteGraphHtml.py -o analysis/Graph.html $(ls analysis/*~*.py)\n"
+        line = f"edgembar-WriteGraphHtml.py -o analysis/Graph.html -x ../Expt.dat $(ls analysis/*~*.py)\n"
         self.analysis_lines.append(line)
         for edge in self.calculation.edges:
             line = f"python analysis/{edge.name}.py\n"
