@@ -435,7 +435,7 @@ class NewLambdaSchedule:
         return
     
 
-class ApplyRMSRestraints:
+class RMSRestraints:
     """ Class to apply RMSD restraints to a system.
     
     Parameters
@@ -711,7 +711,74 @@ for edge in edges:
         return
 
 
+if __name__ == "__main__":
+    import argparse, json
 
+    parser = argparse.ArgumentParser(description="Create submission scripts for RBFE calculations")
+    parser.add_argument("--modify", type=str, help="The system to be modified (copy edges, change parameters, etc.)")
+    parser.add_argument("--reference", type=str, help="A reference system (which will NOT be modified)")
+    parser.add_argument("--mode", default="help", type=str, help="The mode to run the script in. [help, setup, copy, update, rmsd, analysis]")
+    parser.add_argument("--aq", default="aq_equil_template.sh", type=str, help="The template file for the aq folder")
+    parser.add_argument("--com", default="equil_template.sh", type=str, help="The template file for the com folder")
+    parser.add_argument("--toolkit_bin", type=str, help="The path to the toolkit binaries")
+    parser.add_argument("--change_parameters", default=None, type=str, help="Which files to replace the parameters in")
+    parser.add_argument("--new_parameters", default=None, type=str, help="The new parameters to use in the mdin files")
+    parser.add_argument("--output", default="RBFE_Analysis", type=str, help="The output directory for the analysis")
+    parser.add_argument("--ntasks", default=56, type=int, help="The number of threads to use in the analysis")
+    args = parser.parse_args()
+
+    if args.toolkit_bin is not None:
+        with open('toolkit_bin.info','w') as f:
+            f.write(args.toolkit_bin)
+    
+    if Path("toolkit_bin.info").exists():
+        with open('toolkit_bin.info','r') as f:
+            toolkit_bin = f.read().strip()
+    else:
+        toolkit_bin = "./"
+
+    if args.mode == "help":
+        print("The following modes are available: setup, copy, update, rmsd, analysis")
+    
+    if args.mode == "setup":
+        system = Calculation(args.modify)
+        system.find_edges()
+        system.write_calculation_submissions(args.aq, args.com, "equil", 1)
+        system.write_network_submission("submit_runs.sh")
+
+    if args.mode == "copy":
+        system = Calculation(args.reference)
+        system.find_edges()
+        system.copy_edges(args.modify)
+
+    if args.mode == "update":
+        system = Calculation(args.modify)
+        system.find_edges()
+        new_params = json.loads(args.new_parameters)
+        system.change_all_params(which=args.change_parameters, new_params=new_params)
+
+    if args.mode =="rmsd":
+        rmsd = RMSRestraints(args.reference)
+        print("Getting Average Structures")
+        rmsd.GetAverageStructures()
+        print("Combining Average Structures")
+        rmsd.CombineAverageStructures()
+        print("Apply Reference Structures")
+        rmsd.ApplyReferenceToSystem(args.modify)
+    
+    if args.mode == "analysis":
+        analysis = RBFE_Analysis(args.modify, trials=[1,2,3], num_threads=args.ntasks, output_dir=args.output, toolkit_bin=toolkit_bin)
+        analysis.grab_data_lines()
+        analysis.discover_edges()
+        analysis.write_edgembar()
+        analysis.write_finalize()
+        analysis.write()
+
+
+
+
+
+"""
 if __name__ == "__main__":
     import argparse, json
 
@@ -768,3 +835,6 @@ if __name__ == "__main__":
         analysis.write_edgembar()
         analysis.write_finalize()
         analysis.write()
+
+        
+"""
