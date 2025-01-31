@@ -35,7 +35,7 @@ class Calculation:
         if len(self.edges) == 0:
             raise ValueError("No edges found.")
     
-    def write_calculation_submissions(self, aqtemplate, comtemplate, tag, trial):
+    def write_calculation_submissions(self, aqtemplate, comtemplate, tag):
         """ Copies a template file and replaces placeholders with edge-specific values
         
         Parameters
@@ -56,7 +56,7 @@ class Calculation:
         """
         self._check_edges()
         for edge in self.edges:
-            edge.replace_from_template(aqtemplate, comtemplate, tag=tag, trial=trial)
+            edge.replace_from_template(aqtemplate, comtemplate, tag=tag)
         
 
     def write_network_submission(self, filename="submit_runs.sh"):
@@ -146,7 +146,7 @@ class Edge:
         self.submissions = {"aq": None, "com": None}
         self.endpoints = [0.00000000, 1.00000000]
     
-    def replace_from_template(self, aqtemplate, comtemplate, tag="equil", trial=1):
+    def replace_from_template(self, aqtemplate, comtemplate, tag="equil"):
         """ Replaces placeholders in a template file with edge-specific values
         
         Parameters
@@ -176,20 +176,18 @@ class Edge:
             for line in content:
                 if "AAA" in line:
                     line = line.replace("AAA", self.name)
-                if "BBB" in line:
-                    line = line.replace("BBB", str(trial))
                 if check_lambda.exists():
                     if "CCC" in line:
                         line = line.replace("CCC", lambda_line)
                 lines.append(line)
             if tv == 0:
-                with open(self.aq / f"aq_{tag}_{trial}.sh", "w") as f:
+                with open(self.aq / f"aq_{tag}.sh", "w") as f:
                     f.write("".join(lines))
-                self.submissions["aq"]=f"aq_{tag}_{trial}.sh"
+                self.submissions["aq"]=f"aq_{tag}.sh"
             else:
-                with open(self.com / f"{tag}_{trial}.sh", "w") as f:
+                with open(self.com / f"{tag}.sh", "w") as f:
                     f.write("".join(lines))
-                self.submissions["com"]=f"{tag}_{trial}.sh"
+                self.submissions["com"]=f"{tag}.sh"
 
     def get_submission(self):
         """ Returns a list of submission commands for the edge 
@@ -720,6 +718,7 @@ if __name__ == "__main__":
     parser.add_argument("--mode", default="help", type=str, help="The mode to run the script in. [help, setup, copy, update, rmsd, analysis]")
     parser.add_argument("--aq", default="aq_equil_template.sh", type=str, help="The template file for the aq folder")
     parser.add_argument("--com", default="equil_template.sh", type=str, help="The template file for the com folder")
+    parser.add_argument("--tag", default="equil", type=str, help="The tag to use in the file name [equil or ti]")
     parser.add_argument("--toolkit_bin", type=str, help="The path to the toolkit binaries")
     parser.add_argument("--change_parameters", default=None, type=str, help="Which files to replace the parameters in")
     parser.add_argument("--new_parameters", default=None, type=str, help="The new parameters to use in the mdin files")
@@ -739,11 +738,13 @@ if __name__ == "__main__":
 
     if args.mode == "help":
         print("The following modes are available: setup, copy, update, rmsd, analysis")
+        print("setup example: python rbfe_controller.py --modify system --mode setup --aq aq_equil_template.sh --com equil_template.sh -tag equil")
+        print("copy example: python rbfe_controller.py --modify system --mode copy --reference reference_system")
     
     if args.mode == "setup":
         system = Calculation(args.modify)
         system.find_edges()
-        system.write_calculation_submissions(args.aq, args.com, "equil", 1)
+        system.write_calculation_submissions(args.aq, args.com, args.tag)
         system.write_network_submission("submit_runs.sh")
 
     if args.mode == "copy":
