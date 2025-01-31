@@ -84,13 +84,15 @@ class Calculation:
         print("To submit calculation, run: \n bash submit_runs.sh")
         return
     
-    def copy_edges(self, new_system):
+    def copy_edges(self, new_system, ntrials=1):
         """ Copies the edges to a new system 
         
         Parameters
         ----------
         new_system : str
             The name of the new system
+        ntrials : int
+            The number of trials to copy
         
         Returns
         -------
@@ -99,7 +101,7 @@ class Calculation:
         """
         new_system_path = Path(new_system)
         for edge in self.edges:
-            edge.copy(new_system_path)
+            edge.copy(new_system_path, ntrials=ntrials)
         return
 
     def change_all_params(self, which="all", new_params={}):
@@ -206,7 +208,7 @@ class Edge:
                 lines.append("cd -\n")
         return lines
     
-    def copy(self, new_system_path):
+    def copy(self, new_system_path, ntrials=1):
         """ Copies the edge to a new system 
         
         Parameters
@@ -228,7 +230,7 @@ class Edge:
 
             lambda_schedule = np.genfromtxt(f"set_lambda_schedule/{self.name}_ar_16.txt")
             print(f"Copying {input_dir} to {output_dir}")
-            ti = NewLambdaSchedule(input_dir, output_dir, lambda_schedule=lambda_schedule, ntrials=3)
+            ti = NewLambdaSchedule(input_dir, output_dir, lambda_schedule=lambda_schedule, ntrials=ntrials)
             ti.find_all_files()
             ti.write_new_lambda_schedule()
             ti.write_group_files()
@@ -724,6 +726,7 @@ if __name__ == "__main__":
     parser.add_argument("--new_parameters",     default=None,                   type=str, help="The new parameters to use in the mdin files")
     parser.add_argument("--output",             default="RBFE_Analysis",        type=str, help="The output directory for the analysis")
     parser.add_argument("--ntasks",             default=56,                     type=int, help="The number of threads to use in the analysis")
+    parser.add_argument("--ntrials",            default=3,                      type=int, help="The number of trials to copy")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
@@ -757,7 +760,7 @@ if __name__ == "__main__":
             raise ValueError("Must provide a reference system for the copy.")
         system = Calculation(args.reference)
         system.find_edges()
-        system.copy_edges(args.modify)
+        system.copy_edges(args.modify, ntrials=args.ntrials)
 
     if args.mode == "update":
         if args.modify is None:
