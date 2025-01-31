@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#SBATCH --job-name="AAA_BBB.slurm"
-#SBATCH --output="AAA_BBB.slurm.slurmout"
-#SBATCH --error="AAA_BBB.slumerr"
+#SBATCH --job-name="AAA.slurm"
+#SBATCH --output="AAA.slurm.slurmout"
+#SBATCH --error="AAA.slumerr"
 #SBATCH --partition=rtx
 #SBATCH --nodes=1
 #SBATCH --ntasks=24
