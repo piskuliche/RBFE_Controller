@@ -713,17 +713,17 @@ if __name__ == "__main__":
     import argparse, json
 
     parser = argparse.ArgumentParser(description="Create submission scripts for RBFE calculations")
-    parser.add_argument("--modify", type=str, help="The system to be modified (copy edges, change parameters, etc.)")
-    parser.add_argument("--reference", type=str, help="A reference system (which will NOT be modified)")
-    parser.add_argument("--mode", default="help", type=str, help="The mode to run the script in. [help, setup, copy, update, rmsd, analysis]")
-    parser.add_argument("--aq", default="aq_equil_template.sh", type=str, help="The template file for the aq folder")
-    parser.add_argument("--com", default="equil_template.sh", type=str, help="The template file for the com folder")
-    parser.add_argument("--tag", default="equil", type=str, help="The tag to use in the file name [equil or ti]")
-    parser.add_argument("--toolkit_bin", type=str, help="The path to the toolkit binaries")
-    parser.add_argument("--change_parameters", default=None, type=str, help="Which files to replace the parameters in")
-    parser.add_argument("--new_parameters", default=None, type=str, help="The new parameters to use in the mdin files")
-    parser.add_argument("--output", default="RBFE_Analysis", type=str, help="The output directory for the analysis")
-    parser.add_argument("--ntasks", default=56, type=int, help="The number of threads to use in the analysis")
+    parser.add_argument("--modify",             default=None,                   type=str, help="The system to be modified (copy edges, change parameters, etc.)")
+    parser.add_argument("--reference",          default=None,                   type=str, help="A reference system (which will NOT be modified)")
+    parser.add_argument("--mode",               default="help",                 type=str, help="The mode to run the script in. [help, setup, copy, update, rmsd, analysis]")
+    parser.add_argument("--aq",                 default="aq_equil_template.sh", type=str, help="The template file for the aq folder")
+    parser.add_argument("--com",                default="equil_template.sh",    type=str, help="The template file for the com folder")
+    parser.add_argument("--tag",                default="equil",                type=str, help="The tag to use in the file name [equil or ti]")
+    parser.add_argument("--toolkit_bin",        default=None,                   type=str, help="The path to the toolkit binaries")
+    parser.add_argument("--change_parameters",  default=None,                   type=str, help="Which files to replace the parameters in")
+    parser.add_argument("--new_parameters",     default=None,                   type=str, help="The new parameters to use in the mdin files")
+    parser.add_argument("--output",             default="RBFE_Analysis",        type=str, help="The output directory for the analysis")
+    parser.add_argument("--ntasks",             default=56,                     type=int, help="The number of threads to use in the analysis")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
@@ -740,25 +740,42 @@ if __name__ == "__main__":
         print("The following modes are available: setup, copy, update, rmsd, analysis")
         print("setup example: python rbfe_controller.py --modify system --mode setup --aq aq_equil_template.sh --com equil_template.sh -tag equil")
         print("copy example: python rbfe_controller.py --modify system --mode copy --reference reference_system")
+        print("update example: python rbfe_controller.py --modify system --mode update --change_parameters all --new_parameters '{\"nstlim\": 1000}'")
+        print("rmsd example: python rbfe_controller.py --modify system --mode rmsd --reference reference_system")
+        print("analysis example: python rbfe_controller.py --reference system --mode analysis --output RBFE_Analysis --ntasks 56")
     
     if args.mode == "setup":
+        if args.modify is None:
+            raise ValueError("Must provide a system to modify.")
         system = Calculation(args.modify)
         system.find_edges()
         system.write_calculation_submissions(args.aq, args.com, args.tag)
         system.write_network_submission("submit_runs.sh")
 
     if args.mode == "copy":
+        if args.reference is None:
+            raise ValueError("Must provide a reference system for the copy.")
         system = Calculation(args.reference)
         system.find_edges()
         system.copy_edges(args.modify)
 
     if args.mode == "update":
+        if args.modify is None:
+            raise ValueError("Must provide a system to modify with new parameters.")
+        if args.change_parameters is None:
+            raise ValueError("Must provide which parameters to change.")
+        if args.new_parameters is None:
+            raise ValueError("Must provide the new parameters to use.")
         system = Calculation(args.modify)
         system.find_edges()
         new_params = json.loads(args.new_parameters)
         system.change_all_params(which=args.change_parameters, new_params=new_params)
 
     if args.mode =="rmsd":
+        if args.reference is None:
+            raise ValueError("Must provide a reference system for the RMSD restraints.")
+        if args.modify is None:
+            raise ValueError("Must provide a system to modify with RMSD restraints.")
         rmsd = RMSRestraints(args.reference)
         print("Getting Average Structures")
         rmsd.GetAverageStructures()
@@ -768,7 +785,9 @@ if __name__ == "__main__":
         rmsd.ApplyReferenceToSystem(args.modify)
     
     if args.mode == "analysis":
-        analysis = RBFE_Analysis(args.modify, trials=[1,2,3], num_threads=args.ntasks, output_dir=args.output, toolkit_bin=toolkit_bin)
+        if args.reference is None:
+            raise ValueError("Must provide a reference system for the analysis.")
+        analysis = RBFE_Analysis(args.reference, trials=[1,2,3], num_threads=args.ntasks, output_dir=args.output, toolkit_bin=toolkit_bin)
         analysis.grab_data_lines()
         analysis.discover_edges()
         analysis.write_edgembar()
