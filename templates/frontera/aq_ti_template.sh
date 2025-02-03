@@ -29,8 +29,9 @@ nvidia-cuda-mps-control -d
 # check if AMBERHOME is set
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
 for trial in $(seq 1 1 3); do
+    echo "******** Working on Trial ${trial} ********"
     #Copy the ATI files
-    if [ ${trial} -gt 1 ] then;
+    if [ ${trial} -gt 1 ]; then
         for lam in ${lams[@]};
         do
             cp t1/${lam}_preTI.rst7 t${trial}/${lam}_{eqATI}.rst7;

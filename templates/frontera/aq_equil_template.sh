@@ -27,7 +27,7 @@ nvidia-cuda-mps-control -d
 
 # check if AMBERHOME is set
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
-trail=1
+trial=1
 	if [ ! -d t${trial} ];then mkdir t${trial}; fi
 
 	count=-1; alllams=0

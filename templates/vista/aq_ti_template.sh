@@ -30,18 +30,19 @@ nvidia-cuda-mps-control -d
 # check if AMBERHOME is set
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
 for trial in $(seq 1 1 3); do
-	#Copy the ATI files
-	if [ ${trial} -gt 1 ] then;
-			for lam in ${lams[@]};
-					do
-							cp t1/${lam}_preTI.rst7 t${trial}/${lam}_{eqATI}.rst7;
-					done
-	fi
-	# run production
-	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
-	mpirun -np ${#lams[@]} ${EXE} -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile
-	echo "running replica ti"
-	mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
+    echo "******** Working on Trial ${trial} ********"
+    #Copy the ATI files
+    if [ ${trial} -gt 1 ]; then
+        for lam in ${lams[@]};
+        do
+            cp t1/${lam}_preTI.rst7 t${trial}/${lam}_{eqATI}.rst7;
+        done
+    fi
+    # run production
+    EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
+    mpirun -np ${#lams[@]} ${EXE} -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile
+    echo "running replica ti"
+    mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
 done
 
 ### CUDA MPS # BEGIN ###
