@@ -28,7 +28,7 @@ nvidia-cuda-mps-control -d
 
 # check if AMBERHOME is set
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
-for trial in $(seq 1 1 3); do
+trial=1
 	if [ ! -d t${trial} ];then mkdir t${trial}; fi
 
 	count=-1; alllams=0
@@ -212,7 +212,7 @@ EOF2
 	# run production
 	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
 	echo "ready_for replica ti"
-done # trials
+
 
 ### CUDA MPS # BEGIN ###
 echo quit | nvidia-cuda-mps-control
