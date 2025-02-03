@@ -1,0 +1,25 @@
+# ****** Restraints ****** #
+## Weak 5 kcal Restraints on P atoms ##
+rmsd_mask(1) = '@P' ! Restrain phosphorus atoms
+rmsd_strength(1) = 5.0 ! Use 5.0 kcal/mol/angstrom force constant
+rmsd_type       = 1 ! Use RMSD type 1 (E=w*(Sum of distance deviation))
+rmsd_ti(1)      = 3 ! restraint will be full for all lambda values. 
+
+
+## Weak 1kcal Restraints on P atoms ##
+rmsd_mask(1) = '@P' ! Restrain phosphorus atoms
+rmsd_strength(1) = 1.0 ! Use 5.0 kcal/mol/angstrom force constant
+rmsd_type       = 1 ! Use RMSD type 1 (E=w*(Sum of distance deviation))
+rmsd_ti(1)      = 3 ! restraint will be full for all lambda values.
+
+## Weak 5 kcal Restraints on backbone atoms ##
+rmsd_mask(1) = "@O3',P,O5',C5',C4',C1',C3',C2',O2'" ! Restrain the backbone, minus sugars.
+rmsd_strength(1) = 5.0 ! Use 5.0 kcal/mol/angstrom force constant
+rmsd_type       = 1 ! Use RMSD type 1 (E=w*(Sum of distance deviation))
+rmsd_ti(1)      = 3 ! restraint will be full for all lambda values.
+
+## Weak 5 kcal Restraints on backbone atoms ##
+rmsd_mask(1) = ":U,G,A,C,G5,C5,U5,A5,G3,C3,U3,A3 & !@H=" ! Restrain all of RNA except for H atoms
+rmsd_strength(1) = 5.0 ! Use 5.0 kcal/mol/angstrom force constant
+rmsd_type       = 1 ! Use RMSD type 1 (E=w*(Sum of distance deviation))
+rmsd_ti(1)      = 3 ! restraint will be full for all lambda values.
