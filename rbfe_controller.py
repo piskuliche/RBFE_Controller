@@ -2,6 +2,7 @@ from pathlib import Path
 from glob import glob
 import numpy as np
 import shutil
+import subprocess
 
 class Calculation:
     def __init__(self, system):
@@ -29,6 +30,7 @@ class Calculation:
         edgepath = Path(f"{self.system}/unified/run")
         for edge in glob(f"{edgepath}/*"):
             self.add_edge(Edge(edge, self.system))
+
 
     def _check_edges(self):
         """ Checks if there are any edges in the calculation """
