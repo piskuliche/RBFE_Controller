@@ -463,7 +463,7 @@ class RMSRestraints:
             cpptraj_tmp = self._write_edge_ligand_lines(edge)
             cpptraj_master_lines.extend(cpptraj_tmp)
         cpptraj_master_lines.append(f"cpptraj -i {self.inputs_dir}/av_tgt.in\n")
-        with open("cpptraj_master.sh", "w") as f:
+        with open("rmsd_step1_getavstruct.sh", "w") as f:
             for line in cpptraj_master_lines:
                 f.write(line)
         return
@@ -498,7 +498,7 @@ class RMSRestraints:
                     f.write(line)
 
             cpptraj_master_lines.append(f"cpptraj -i {self.inputs_dir}/av_lig_tgt_{edge.name}_step2.in\n")
-        with open("cpptraj_master.sh", "w") as f:
+        with open("rmsd_step_2_combine.sh", "w") as f:
             for line in cpptraj_master_lines:
                 f.write(line)
         return
