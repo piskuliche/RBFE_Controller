@@ -709,6 +709,8 @@ for edge in edges:
                 f.write(line)
         print("To run the analysis, run: \n bash analysis.sh")
         return
+    
+
 
 
 if __name__ == "__main__":

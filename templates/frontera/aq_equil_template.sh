@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 #SBATCH --job-name="AAA.slurm"
 #SBATCH --output="AAA.slurm.slurmout"
-#SBATCH --error="AAA.slumerr"
-#SBATCH --partition=gh
-#SBATCH --nodes=1
+#SBATCH --partition=rtx
+#SBATCH --nodes=2
 #SBATCH --ntasks=24
-#SBATCH --time=2-00:00:00
+#SBATCH --time=0-48:00:00
 
-source /work/10162/piskuliche/vista/Software/FE-Workflow/FE-Workflow.bashrc
+source /work2/10162/piskuliche/frontera/Software/FE-Workflow/FE-Workflow.bashrc
 
 top=${PWD}
 endstates=(0.00000000 1.00000000)
 lams=CCC
 twostate=true
-eqstage=(init min1 min2 eqpre1P0 eqpre2P0 eqP0 eqNTP4 eqV eqP eqA eqProt2 eqProt1 eqProt05 eqProt025 eqProt01 eqProt0 minTI eqpre1P0TI eqpre2P0TI eqP0TI eqATI preTI)
-preminTIstage=eqProt0
+eqstage=(init min1 min2 eqpre1P0 eqpre2P0 eqP0 eqNTP4 eqV eqP eqA minTI eqpre1P0TI eqpre2P0TI eqP0TI eqATI preTI)
+preminTIstage=eqA
+
 
 ### CUDA MPS # BEGIN ###
 temp_path=/tmp/temp_${SLURM_JOB_ID}
@@ -25,12 +25,9 @@ nvidia-cuda-mps-control -d
 ### CUDA MPS # END ###
 
 
-
 # check if AMBERHOME is set
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
-
 for trial in $(seq 1 1 3); do
-
 	if [ ! -d t${trial} ];then mkdir t${trial}; fi
 
 	count=-1; alllams=0
@@ -39,7 +36,16 @@ for trial in $(seq 1 1 3); do
         	lastcount=$((${count}-1))
 		if [ "${stage}" == "init" ] || [ "${stage}" == "eqpre1P0TI" ] || [ "${stage}" == "eqpre2P0TI" ] || [ "${stage}" == "eqP0TI" ]; then continue; fi
         	laststage=${eqstage[${lastcount}]}
-
+			# This section checks if the previous stage has completed successfully
+			if grep -q "Error on OPEN" t${trial}/0.00000000_${laststage}.mdout;
+                then
+                        echo "ERROR - Run failed at ${laststage}"
+                        echo "Exiting"
+                        scancel $SLURM_JOB_ID
+                else
+                        echo "${laststage} okay ->"
+                        echo "Proceeding with ${stage}"
+                fi
         	if [ "$stage" == "minTI" ]; then alllams=1; fi
 
         	if [ ${alllams} -eq 0 ];then
@@ -204,10 +210,9 @@ EOF2
 	
 	# run production
 	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
-	echo "ready for replica ti"
-done
+	echo "ready_for replica ti"
+done # trials
 
 ### CUDA MPS # BEGIN ###
 echo quit | nvidia-cuda-mps-control
 ### CUDA MPS # END ###
-

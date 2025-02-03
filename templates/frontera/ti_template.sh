@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 #SBATCH --job-name="AAA.slurm"
 #SBATCH --output="AAA.slurm.slurmout"
-#SBATCH --error="AAA.slumerr"
-#SBATCH --partition=gh
-#SBATCH --nodes=1
+#SBATCH --partition=rtx
+#SBATCH --nodes=2
 #SBATCH --ntasks=24
-#SBATCH --time=2-00:00:00
+#SBATCH --time=0-48:00:00
 
-source /work/10162/piskuliche/vista/Software/FE-Workflow/FE-Workflow.bashrc
+source /work2/10162/piskuliche/frontera/Software/FE-Workflow/FE-Workflow.bashrc
 
 top=${PWD}
 endstates=(0.00000000 1.00000000)
@@ -29,11 +28,19 @@ nvidia-cuda-mps-control -d
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
 
 for trial in $(seq 1 1 3); do
-# run production
-	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
-	echo "running replica ti"
-	mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
-
+    #Copy the ATI files
+    if [ ${trial} -gt 1 ] then;
+        for lam in ${lams[@]};
+        do
+            cp t1/${lam}_preTI.rst7 t${trial}/${lam}_{eqATI}.rst7;
+        done
+    fi
+    # run production
+    EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
+    mpirun -np ${#lams[@]} ${EXE} -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile
+    echo "running replica ti"
+    mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
+    
 done
 
 ### CUDA MPS # BEGIN ###
