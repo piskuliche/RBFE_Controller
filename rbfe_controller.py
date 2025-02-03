@@ -474,9 +474,9 @@ class RMSRestraints:
         cpptraj_master_lines = []
         av_tgt_lines = []
         # Writes the cpptraj script to combine the average structures
-        av_tgt_lines.append(f"parm {self.storage_dir}/av_tgt.rst7\n")
+        av_tgt_lines.append(f"parm {self.storage_dir}/av_tgt.parm7\n")
         for edge in self.original_system.edges:
-            av_tgt_lines.append(f"parm {self.storage_dir}/av_tgt_{edge.name}.rst7\n")
+            av_tgt_lines.append(f"trajin {self.storage_dir}/av_tgt_{edge.name}.rst7\n")
         av_tgt_lines.append(f"autoimage\n")
         av_tgt_lines.append(f"average {self.storage_dir}/av.rst7\n")
         av_tgt_lines.append("run\n")
