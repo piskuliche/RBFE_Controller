@@ -269,11 +269,11 @@ class Edge:
                     self.update_mdin(file, new_params)
             else:
                 if which == "all":
-                    files1 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_*.mdin")
-                    files2 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_*.mdin")
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/0.00000000_*.mdin")
+                    files2 = glob(f"{self.__dict__[sys]}/inputs/1.00000000_*.mdin")
                 else:
-                    files1 = [f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_{which}.mdin"]
-                    files2 = [f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_{which}.mdin"]
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/0.00000000_{which}.mdin")
+                    files2 = glob(f"{self.__dict__[sys]}/inputs/1.00000000_{which}.mdin")
                 print(files1, files2)
                 for file in files1:
                     self.update_mdin(file, new_params)
