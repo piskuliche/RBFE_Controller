@@ -123,7 +123,7 @@ class Calculation:
         """
         self._check_edges()
         for edge in self.edges:
-            edge.change_mdin_params(which=which, new_params=new_params, endpoints_only=endpoints_only)
+            edge.change_mdin_params(which=which, new_params=new_params, endpoints=endpoints_only)
         return
 
 
