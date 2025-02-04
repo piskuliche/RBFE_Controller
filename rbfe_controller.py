@@ -796,7 +796,7 @@ if __name__ == "__main__":
         system = Calculation(args.modify)
         system.find_edges()
         new_params = json.loads(args.new_parameters)
-        system.change_all_params(which=args.change_parameters, new_params=new_params, endpoints=endpoints_only)
+        system.change_all_params(which=args.change_parameters, new_params=new_params, endpoints_only=endpoints_only)
 
     if args.mode =="rmsd":
         if args.reference is None:
