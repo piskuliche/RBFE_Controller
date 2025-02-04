@@ -106,7 +106,7 @@ class Calculation:
             edge.copy(new_system_path, ntrials=ntrials)
         return
 
-    def change_all_params(self, which="all", new_params={}):
+    def change_all_params(self, which="all", new_params={}, endpoints_only=False):
         """ Replaces parameters in the mdin files for all edges in the calculation 
         
         Parameters
@@ -123,7 +123,7 @@ class Calculation:
         """
         self._check_edges()
         for edge in self.edges:
-            edge.change_mdin_params(which=which, new_params=new_params)
+            edge.change_mdin_params(which=which, new_params=new_params, endpoints_only=endpoints_only)
         return
 
 
@@ -238,7 +238,7 @@ class Edge:
             ti.write_group_files()
         return
     
-    def change_mdin_params(self, which="all", new_params={}):
+    def change_mdin_params(self, which="all", new_params={}, endpoints="False"):
         """ Replace parameters in the mdin files for the edge 
         
         Parameters
@@ -247,6 +247,8 @@ class Edge:
             Which files to replace the parameters in
         new_params : dict
             The new parameters to use
+        endpoints : bool
+            Whether to only change the endpoints
         
         Returns
         -------
@@ -257,13 +259,26 @@ class Edge:
             print("No new parameters to update.")
             return
         for sys in ["aq", "com"]:
-            files = []
-            if which == "all":
-                files = glob(f"{self.__dict__[sys]}/inputs/*.mdin")
+            files1, files2 = [], []
+            if not endpoints:
+                if which == "all":
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/*.mdin")
+                else:
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/*{which}.mdin")
+                for file in files1:
+                    self.update_mdin(file, new_params)
             else:
-                files = glob(f"{self.__dict__[sys]}/inputs/*{which}.mdin")
-            for file in files:
-                self.update_mdin(file, new_params)
+                if which == "all":
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_*.mdin")
+                    files2 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_*.mdin")
+                else:
+                    files1 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_{which}.mdin")
+                    files2 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_{which}.mdin")
+                for file in files1:
+                    self.update_mdin(file, new_params)
+                for file in files2:
+                    self.update_mdin(file, new_params)
+
         return
     
     def update_mdin(self, file, new_params):
@@ -731,6 +746,7 @@ if __name__ == "__main__":
     parser.add_argument("--output",             default="RBFE_Analysis",        type=str, help="The output directory for the analysis")
     parser.add_argument("--ntasks",             default=56,                     type=int, help="The number of threads to use in the analysis")
     parser.add_argument("--ntrials",            default=3,                      type=int, help="The number of trials to copy")
+    parser.add_argument("--endpoints_only",     default="False",                type=str, help="Only change the endpoints")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
@@ -773,10 +789,13 @@ if __name__ == "__main__":
             raise ValueError("Must provide which parameters to change.")
         if args.new_parameters is None:
             raise ValueError("Must provide the new parameters to use.")
+        if args.endpoints_only not in ["True", "False"]:
+            raise ValueError("endpoints_only must be either True or False")
+        endpoints_only = True if args.endpoints_only == "True" else False
         system = Calculation(args.modify)
         system.find_edges()
         new_params = json.loads(args.new_parameters)
-        system.change_all_params(which=args.change_parameters, new_params=new_params)
+        system.change_all_params(which=args.change_parameters, new_params=new_params, endpoints=endpoints_only)
 
     if args.mode =="rmsd":
         if args.reference is None:
