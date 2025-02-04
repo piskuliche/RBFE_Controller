@@ -35,7 +35,7 @@ for trial in $(seq 1 1 3); do
     if [ ${trial} -gt 1 ]; then
         for lam in ${lams[@]};
         do
-            cp t1/${lam}_preTI.rst7 t${trial}/${lam}_{eqATI}.rst7;
+            cp t1/${lam}_preTI.rst7 t${trial}/${lam}_eqATI.rst7;
         done
     fi
     # run production
