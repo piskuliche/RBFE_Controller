@@ -272,8 +272,8 @@ class Edge:
                     files1 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_*.mdin")
                     files2 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_*.mdin")
                 else:
-                    files1 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_{which}.mdin")
-                    files2 = glob(f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_{which}.mdin")
+                    files1 = [f"{self.__dict__[sys]}/inputs/{self.endpoints[0]}_{which}.mdin"]
+                    files2 = [f"{self.__dict__[sys]}/inputs/{self.endpoints[1]}_{which}.mdin"]
                 print(files1, files2)
                 for file in files1:
                     self.update_mdin(file, new_params)
