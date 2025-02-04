@@ -764,6 +764,7 @@ if __name__ == "__main__":
         print("setup example: python rbfe_controller.py --modify system --mode setup --aq aq_equil_template.sh --com equil_template.sh -tag equil")
         print("copy example: python rbfe_controller.py --modify system --mode copy --reference reference_system")
         print("update example: python rbfe_controller.py --modify system --mode update --change_parameters all --new_parameters '{\"nstlim\": 1000}'")
+        print("update only endpoints example: python rbfe_controller.py --modify system --mode update --change_parameters all --new_parameters '{\"ntx\": 1000}' --endpoints_only True")
         print("rmsd example: python rbfe_controller.py --modify system --mode rmsd --reference reference_system")
         print("analysis example: python rbfe_controller.py --reference system --mode analysis --output RBFE_Analysis --ntasks 56")
     
