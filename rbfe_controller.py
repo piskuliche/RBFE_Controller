@@ -738,7 +738,7 @@ for edge in edges:
         for edge in self.calculation.edges:
             for sim_sys in ["aq", "com"]:
                 for trial in self.trials:
-                    line = f"fetkutils-tischedule.py --opt {optimize} --ar --ssc --plot {optimize_dir}/opt_ar_{optimize}.txt ./data/{edge.name}/{sim_sys}/{trial}/\n"
+                    line = f"fetkutils-tischedule.py --opt {optimize} --ar --ssc --plot {optimize_dir}/{edge.name}_{sim_sys}_ar_{optimize}.txt ./data/{edge.name}/{sim_sys}/{trial}/\n"
                     lines.append(line)
         with open("optimize.sh", "w") as f:
             for line in lines:
