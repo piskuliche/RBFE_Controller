@@ -730,7 +730,8 @@ for edge in edges:
     def write_optimize(self, optimize=16, trial=1, toolkit_bin=None):
         lines = []
         if toolkit_bin is not None:
-            lines.append([f"export PATH={toolkit_bin}/bin:$PATH\n", f"export PYTHONPATH={toolkit_bin}/lib/python3.11/site-packages/:$PYTHONPATH\n"])
+            lines.append(f"export PATH={toolkit_bin}/bin:$PATH\n")
+            lines.append(f"export PYTHONPATH={toolkit_bin}/lib/python3.11/site-packages/:$PYTHONPATH\n")
         optimize_dir = self.output_dir / "optimize"
         if not optimize_dir.exists():
             optimize_dir.mkdir(parents=True, exist_ok=True)
