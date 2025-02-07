@@ -727,6 +727,22 @@ for edge in edges:
         print("To run the analysis, run: \n bash analysis.sh")
         return
     
+    def write_optimize(self, optimize=16, trial=1):
+        lines = []
+        optimize_dir = self.output_dir / "optimize"
+        if not optimize_dir.exists():
+            optimize_dir.mkdir(parents=True, exist_ok=True)
+        for edge in self.calculation.edges:
+            for sim_sys in ["aq", "com"]:
+                for trial in self.trials:
+                    line = f"fetkutils-tischedule.py --opt {optimize} --ar --ssc --plot {optimize_dir}/opt_ar_{optimize}.txt ./data/{edge.name}/{sim_sys}/{trial}/\n"
+                    lines.append(line)
+        with open("optimize.sh", "w") as f:
+            for line in lines:
+                f.write(line)
+        print("To optimize the lambda schedule, run: \n bash optimize.sh")
+        return
+    
 
 
 
@@ -747,6 +763,7 @@ if __name__ == "__main__":
     parser.add_argument("--ntasks",             default=56,                     type=int, help="The number of threads to use in the analysis")
     parser.add_argument("--ntrials",            default=3,                      type=int, help="The number of trials to copy")
     parser.add_argument("--endpoints_only",     default="False",                type=str, help="Only change the endpoints")
+    parser.add_argument("--optimize",           default=24,                   type=str, help="Optimize the lambda schedule")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
@@ -820,6 +837,8 @@ if __name__ == "__main__":
         analysis.write_edgembar()
         analysis.write_finalize()
         analysis.write()
+        if args.optimize is not None:
+            analysis.write_optimize(optimize=args.optimize, trial=1)
 
 
 
