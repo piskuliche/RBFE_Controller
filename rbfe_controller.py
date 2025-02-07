@@ -852,7 +852,9 @@ if __name__ == "__main__":
     if args.mode == "analysis":
         if args.reference is None:
             raise ValueError("Must provide a reference system for the analysis.")
-        analysis = RBFE_Analysis(args.reference, trials=[1,2,3], num_threads=args.ntasks, output_dir=args.output, toolkit_bin=toolkit_bin)
+        trials_list = list(np.arange(1, args.ntrials+1))
+        print(trials_list)
+        analysis = RBFE_Analysis(args.reference, trials=trials_list, num_threads=args.ntasks, output_dir=args.output, toolkit_bin=toolkit_bin)
         analysis.grab_data_lines()
         analysis.discover_edges()
         analysis.write_edgembar()
