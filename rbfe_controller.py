@@ -750,6 +750,7 @@ for edge in edges:
         try:
             optimize_dir = self.output_dir / "optimize"
             opt_schedule = []
+            print(glob(f"{str(optimize_dir)}/*_{optimize}.txt"))
             for file in glob(f"{str(optimize_dir)}/*_{optimize}.txt"):
                 opt_schedule.append(np.genfromtxt(file))
             if len(opt_schedule)>0:
