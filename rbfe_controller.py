@@ -760,7 +760,7 @@ for edge in edges:
                 print("No matching lambda schedule found")
                 return False
         except:
-            print("No matching lambda schedules found.")
+            print("Exception: No matching lambda schedules found.")
             return False
 
     
