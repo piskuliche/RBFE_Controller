@@ -860,8 +860,8 @@ if __name__ == "__main__":
         analysis.write_finalize()
         analysis.write()
         if args.optimize is not None:
-            if not analysis.check_optimized(optimize=args.optimize):
-                analysis.write_optimize(optimize=args.optimize, toolkit_bin=toolkit_bin)
+            analysis.check_optimized(optimize=args.optimize)
+            analysis.write_optimize(optimize=args.optimize, toolkit_bin=toolkit_bin)
 
 
 
