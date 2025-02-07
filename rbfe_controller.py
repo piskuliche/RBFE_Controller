@@ -752,6 +752,7 @@ for edge in edges:
             opt_schedule = []
             for file in glob(f"{optimize_dir}/*_{optimize}.txt"):
                 opt_schedule.append(np.genfromtxt(file))
+                print(file)
             if len(opt_schedule)>0:
                 print("Existing optimized lambda schedules found.")
                 print("Averaged Schedule: ", np.mean(opt_schedule, axis=0))
