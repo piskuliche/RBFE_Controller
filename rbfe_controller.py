@@ -37,7 +37,7 @@ class Calculation:
         if len(self.edges) == 0:
             raise ValueError("No edges found.")
     
-    def write_calculation_submissions(self, aqtemplate, comtemplate, tag):
+    def write_calculation_submissions(self, aqtemplate, comtemplate, tag, nlambda=16):
         """ Copies a template file and replaces placeholders with edge-specific values
         
         Parameters
@@ -50,6 +50,8 @@ class Calculation:
             The tag to use in the file name
         trial : int
             The trial number to use in the file name
+        nlambda : int
+            The number of lambda values to use in the calculation
         
         Returns
         -------
@@ -58,7 +60,7 @@ class Calculation:
         """
         self._check_edges()
         for edge in self.edges:
-            edge.replace_from_template(aqtemplate, comtemplate, tag=tag)
+            edge.replace_from_template(aqtemplate, comtemplate, tag=tag, nlambda=nlambda)
         
 
     def write_network_submission(self, filename="submit_runs.sh"):
@@ -150,7 +152,7 @@ class Edge:
         self.submissions = {"aq": None, "com": None}
         self.endpoints = [0.00000000, 1.00000000]
     
-    def replace_from_template(self, aqtemplate, comtemplate, tag="equil"):
+    def replace_from_template(self, aqtemplate, comtemplate, tag="equil", nlambda=16):
         """ Replaces placeholders in a template file with edge-specific values
         
         Parameters
@@ -172,7 +174,7 @@ class Edge:
             with open(template,"r") as f:
                 content = f.readlines()
             lines = []
-            check_lambda = Path(f"set_lambda_schedule/{self.name}_ar_16.txt")
+            check_lambda = Path(f"set_lambda_schedule/{self.name}_ar_{nlambda}.txt")
             if check_lambda.exists():
                 lambda_schedule = np.genfromtxt(check_lambda)
                 lambda_line = " ".join([f"{x:0.8f}" for x in lambda_schedule])
@@ -784,7 +786,7 @@ if __name__ == "__main__":
     parser.add_argument("--ntasks",             default=56,                     type=int, help="The number of threads to use in the analysis")
     parser.add_argument("--ntrials",            default=3,                      type=int, help="The number of trials to copy")
     parser.add_argument("--endpoints_only",     default="False",                type=str, help="Only change the endpoints")
-    parser.add_argument("--optimize",           default=24,                   type=str, help="Optimize the lambda schedule")
+    parser.add_argument("--nlambda",           default=16,                      type=str, help="Optimize the lambda schedule")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
@@ -811,7 +813,7 @@ if __name__ == "__main__":
             raise ValueError("Must provide a system to modify.")
         system = Calculation(args.modify)
         system.find_edges()
-        system.write_calculation_submissions(args.aq, args.com, args.tag)
+        system.write_calculation_submissions(args.aq, args.com, args.tag, nlambda=args.nlambda)
         system.write_network_submission("submit_runs.sh")
 
     if args.mode == "copy":
@@ -859,9 +861,8 @@ if __name__ == "__main__":
         analysis.write_edgembar()
         analysis.write_finalize()
         analysis.write()
-        if args.optimize is not None:
-            analysis.check_optimized(optimize=args.optimize)
-            analysis.write_optimize(optimize=args.optimize, toolkit_bin=toolkit_bin)
+        analysis.check_optimized(optimize=args.nlambda)
+        analysis.write_optimize(optimize=args.nlambda, toolkit_bin=toolkit_bin)
 
 
 
