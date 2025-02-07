@@ -727,8 +727,10 @@ for edge in edges:
         print("To run the analysis, run: \n bash analysis.sh")
         return
     
-    def write_optimize(self, optimize=16, trial=1):
+    def write_optimize(self, optimize=16, trial=1, toolkit_bin=None):
         lines = []
+        if toolkit_bin is not None:
+            lines.append([f"export PATH={toolkit_bin}/bin:$PATH\n", f"export PYTHONPATH={toolkit_bin}/lib/python3.11/site-packages/:$PYTHONPATH\n"])
         optimize_dir = self.output_dir / "optimize"
         if not optimize_dir.exists():
             optimize_dir.mkdir(parents=True, exist_ok=True)
@@ -838,7 +840,7 @@ if __name__ == "__main__":
         analysis.write_finalize()
         analysis.write()
         if args.optimize is not None:
-            analysis.write_optimize(optimize=args.optimize, trial=1)
+            analysis.write_optimize(optimize=args.optimize, trial=1, toolkit_bin=toolkit_bin)
 
 
 
