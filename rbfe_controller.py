@@ -750,7 +750,7 @@ for edge in edges:
         try:
             optimize_dir = self.output_dir / "optimize"
             opt_schedule = []
-            for file in glob (f"{optimize_dir}/*_{optimize}.txt"):
+            for file in glob(f"{optimize_dir}/*_{optimize}.txt"):
                 opt_schedule.append(np.genfromtxt(file))
             if len(opt_schedule)>0:
                 print("Existing optimized lambda schedules found.")
