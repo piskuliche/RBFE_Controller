@@ -88,7 +88,7 @@ class Calculation:
         print("To submit calculation, run: \n bash submit_runs.sh")
         return
     
-    def copy_edges(self, new_system, ntrials=1):
+    def copy_edges(self, new_system, ntrials=1, nlambda=16):
         """ Copies the edges to a new system 
         
         Parameters
@@ -97,6 +97,8 @@ class Calculation:
             The name of the new system
         ntrials : int
             The number of trials to copy
+        nlambda : int
+            The number of lambda values to use in the calculation
         
         Returns
         -------
@@ -105,7 +107,7 @@ class Calculation:
         """
         new_system_path = Path(new_system)
         for edge in self.edges:
-            edge.copy(new_system_path, ntrials=ntrials)
+            edge.copy(new_system_path, ntrials=ntrials, nlambda=nlambda)
         return
 
     def change_all_params(self, which="all", new_params={}, endpoints_only=False):
@@ -212,7 +214,7 @@ class Edge:
                 lines.append("cd -\n")
         return lines
     
-    def copy(self, new_system_path, ntrials=1):
+    def copy(self, new_system_path, ntrials=1, nlambda=16):
         """ Copies the edge to a new system 
         
         Parameters
@@ -232,7 +234,7 @@ class Edge:
             output_dir = new_edge / sys
             output_dir.mkdir(parents=True, exist_ok=True)
 
-            lambda_schedule = np.genfromtxt(f"set_lambda_schedule/{self.name}_ar_16.txt")
+            lambda_schedule = np.genfromtxt(f"set_lambda_schedule/{self.name}_ar_{nlambda}.txt")
             print(f"Copying {input_dir} to {output_dir}")
             ti = NewLambdaSchedule(input_dir, output_dir, lambda_schedule=lambda_schedule, ntrials=ntrials)
             ti.find_all_files()
@@ -821,7 +823,7 @@ if __name__ == "__main__":
             raise ValueError("Must provide a reference system for the copy.")
         system = Calculation(args.reference)
         system.find_edges()
-        system.copy_edges(args.modify, ntrials=args.ntrials)
+        system.copy_edges(args.modify, ntrials=args.ntrials, nlambda=args.nlambda)
 
     if args.mode == "update":
         if args.modify is None:
