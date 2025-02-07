@@ -727,7 +727,7 @@ for edge in edges:
         print("To run the analysis, run: \n bash analysis.sh")
         return
     
-    def write_optimize(self, optimize=16, trial=1, toolkit_bin=None):
+    def write_optimize(self, optimize=16, toolkit_bin=None):
         lines = []
         if toolkit_bin is not None:
             lines.append(f"export PATH={toolkit_bin}/bin:$PATH\n")
@@ -745,6 +745,24 @@ for edge in edges:
                 f.write(line)
         print("To optimize the lambda schedule, run: \n bash optimize.sh")
         return
+    
+    def check_optimized(self, optimize=16):
+        try:
+            optimize_dir = self.output_dir / "optimize"
+            opt_schedule = []
+            for file in glob (f"{optimize_dir}/*_{optimize}.txt"):
+                opt_schedule.append(np.genfromtxt(file))
+            if len(opt_schedule)>0:
+                print("Existing optimized lambda schedules found.")
+                print("Averaged Schedule: ", np.mean(opt_schedule, axis=0))
+                return True
+            else:
+                print("No matching lambda schedule found")
+                return False
+        except:
+            print("No matching lambda schedules found.")
+            return False
+
     
 
 
@@ -841,7 +859,8 @@ if __name__ == "__main__":
         analysis.write_finalize()
         analysis.write()
         if args.optimize is not None:
-            analysis.write_optimize(optimize=args.optimize, trial=1, toolkit_bin=toolkit_bin)
+            if not analysis.check_optimized(optimize=args.optimize):
+                analysis.write_optimize(optimize=args.optimize, toolkit_bin=toolkit_bin)
 
 
 
