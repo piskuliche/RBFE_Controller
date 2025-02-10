@@ -374,28 +374,40 @@ class NewLambdaSchedule:
         newpath.mkdir(parents=True, exist_ok=True)
 
     def write_group_files(self):
-        state_order = ['init', 'min1', 'min2', 'eqpre1P0', 'eqpre2P0', 'eqP0', 'eqNTP4', 'eqV', 'eqP', 'eqA', 'eqProt2', 'eqProt1', 'eqProt05', 'eqProt025', 'eqProt01', 'eqProt0', 'minTI', 'eqpre1P0TI', 'eqpre2P0TI', 'eqP0TI', 'eqATI', 'preTI', 'ti']
+        state_order = ['init', 'min1', 'min2', 'eqpre1P0', 'eqpre2P0', 'eqP0', 'eqNTP4', 'eqV', 'eqP', 'eqA', 'eqProt2', 'eqProt1', 'eqProt05', 'eqProt025', 'eqProt01', 'eqProt0', 'minTI', 'eqpre1P0TI', 'eqpre2P0TI', 'eqP0TI', 'eqATI', 'eqBTI', 'preTI', 'ti']
         end_states = ['eqpre1P0', 'eqpre2P0', 'eqP0', 'eqNTP4', 'eqV', 'eqP', 'eqA', 'eqProt2', 'eqProt1', 'eqProt05', 'eqProt025', 'eqProt01', 'eqProt0']
-        lambda_states = ['eqATI', 'preTI', 'ti']
+        lambda_states = ['eqATI', 'eqBTI']
+        ti_states = ['preTI', 'ti']
+        for end_state in end_states:
+            ep_schedule = [0.00000000, 1.00000000]
+            idx = state_order.index(end_state)
+            out_lines = self.write_group_file_lines(ep_schedule, prevstep=state_order[idx-1], step=end_state, tag="equil", prevtag="equil")
+            with open(f"{self.output_dir}/inputs/equil_{end_state}.groupfile", "w") as f:
+                for line in out_lines:
+                    f.write(line)
+        for lambda_state in lambda_states:
+            idx = state_order.index(lambda_state)
+            out_lines = self.write_group_file_lines(self.lambda_schedule, prevstep=state_order[idx-1], step=lambda_state, tag="equil", prevtag="equil")
+            with open(f"{self.output_dir}/inputs/equil_{lambda_state}.groupfile", "w") as f:
+                for line in out_lines:
+                    f.write(line)
         for ntrial in range(1, self.ntrials+1):
-            for end_state in end_states:
-                lambda_schedule = [0.00000000, 1.00000000]
-                idx = state_order.index(end_state)
-                out_lines = self.write_group_file_lines(lambda_schedule, prevstep=state_order[idx-1], step=end_state, ntrial=ntrial)
-                with open(f"{self.output_dir}/inputs/t{ntrial}_{end_state}.groupfile", "w") as f:
-                    for line in out_lines:
-                        f.write(line)
-            for lambda_state in lambda_states:
-                idx = state_order.index(lambda_state)
-                out_lines = self.write_group_file_lines(self.lambda_schedule, prevstep=state_order[idx-1], step=lambda_state, ntrial=ntrial)
+            for ti_state in ti_states:
+                idx = state_order.index(ti_state)
+                prevtag = ""
+                if ti_state == 'preTI':
+                    prevtag = "equil"
+                else:
+                    prevtag = "ti"
+                out_lines = self.write_group_file_lines(self.lambda_schedule, prevstep=state_order[idx-1], step=ti_state, tag=f"t{ntrial}", prevtag=prevtag)
                 with open(f"{self.output_dir}/inputs/t{ntrial}_{lambda_state}.groupfile", "w") as f:
                     for line in out_lines:
                         f.write(line)
     
-    def write_group_file_lines(self, lambda_schedule=[0.00000000,1.00000000], prevstep="eqATI", step="preTI", ntrial=1):
+    def write_group_file_lines(self, lambda_schedule=[0.00000000,1.00000000], prevstep="eqATI", step="preTI", tag="equil", prevtag="equil"):
         out_lines = []
         for lambda_value in lambda_schedule:
-            line = f"-O -p unisc.parm7 -c t{ntrial}/{lambda_value:.8f}_{prevstep}.rst7 -i inputs/{lambda_value:.8f}_{step}.mdin -o t{ntrial}/{lambda_value:.8f}_{step}.mdout -r t{ntrial}/{lambda_value:.8f}_{step}.rst7 -x t{ntrial}/{lambda_value:.8f}_{step}.nc -ref t{ntrial}/{lambda_value:.8f}_{prevstep}.rst7\n"
+            line = f"-O -p unisc.parm7 -c {prevtag}/{lambda_value:.8f}_{prevstep}.rst7 -i inputs/{lambda_value:.8f}_{step}.mdin -o {tag}/{lambda_value:.8f}_{step}.mdout -r {tag}/{lambda_value:.8f}_{step}.rst7 -x {tag}/{lambda_value:.8f}_{step}.nc -ref {prevtag}/{lambda_value:.8f}_{prevstep}.rst7\n"
             out_lines.append(line)
         return out_lines
     
