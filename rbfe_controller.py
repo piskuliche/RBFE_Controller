@@ -580,7 +580,10 @@ class RMSRestraints:
             new_content = []
             for line in content:
                 if "ref" in line:
-                    line = line.split("-ref")[0] + f"-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7\n"
+                    if "echo" in line:
+                        line = line.split("-ref")[0] + f'-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7"\n'
+                    else:
+                        line = line.split("-ref")[0] + f"-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7\n"
                 new_content.append(line)
             with open(file, "w") as f:
                 for line in new_content:
