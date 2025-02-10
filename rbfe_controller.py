@@ -400,7 +400,7 @@ class NewLambdaSchedule:
                 else:
                     prevtag = "ti"
                 out_lines = self.write_group_file_lines(self.lambda_schedule, prevstep=state_order[idx-1], step=ti_state, tag=f"t{ntrial}", prevtag=prevtag)
-                with open(f"{self.output_dir}/inputs/t{ntrial}_{lambda_state}.groupfile", "w") as f:
+                with open(f"{self.output_dir}/inputs/t{ntrial}_{ti_state}.groupfile", "w") as f:
                     for line in out_lines:
                         f.write(line)
     
