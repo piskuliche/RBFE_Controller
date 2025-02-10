@@ -580,7 +580,7 @@ class RMSRestraints:
             new_content = []
             for line in content:
                 if "ref" in line:
-                    if "echo" in line:
+                    if "echo" in line: # This is a hack to avoid the echo line in the submit script losing a quote
                         line = line.split("-ref")[0] + f'-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7"\n'
                     else:
                         line = line.split("-ref")[0] + f"-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7\n"
