@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --job-name="AAA.slurm"
 #SBATCH --output="AAA.slurm.slurmout"
-#SBATCH --error="AAA.slumerr"
 #SBATCH --partition=gh
 #SBATCH --nodes=1
 #SBATCH --ntasks=24
@@ -30,7 +29,6 @@ nvidia-cuda-mps-control -d
 #if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
 
 trial=1
-
 	if [ ! -d t${trial} ];then mkdir t${trial}; fi
 
 	count=-1; alllams=0
@@ -39,16 +37,12 @@ trial=1
         	lastcount=$((${count}-1))
 		if [ "${stage}" == "init" ] || [ "${stage}" == "eqpre1P0TI" ] || [ "${stage}" == "eqpre2P0TI" ] || [ "${stage}" == "eqP0TI" ]; then continue; fi
         	laststage=${eqstage[${lastcount}]}
-			# This section checks if the previous stage has completed successfully
-			if grep -q "Error on OPEN" t${trial}/0.00000000_${laststage}.mdout;
-                then
-                        echo "ERROR - Run failed at ${laststage}"
-                        echo "Exiting"
-                        scancel $SLURM_JOB_ID
-                else
-                        echo "${laststage} okay ->"
-                        echo "Proceeding with ${stage}"
-                fi
+		if grep -q "Error on OPEN" t${trial}/0.00000000_${laststage}.mdout;
+		then
+			echo "ERROR - Run failed at ${laststage}"
+			echo "Exiting"
+			scancel $SLURM_JOB_ID
+		fi
         	if [ "$stage" == "minTI" ]; then alllams=1; fi
 
         	if [ ${alllams} -eq 0 ];then
@@ -214,7 +208,6 @@ EOF2
 	# run production
 	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
 	echo "ready for replica ti"
-
 
 ### CUDA MPS # BEGIN ###
 echo quit | nvidia-cuda-mps-control
