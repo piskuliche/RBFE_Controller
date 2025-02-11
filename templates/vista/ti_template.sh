@@ -1,50 +1,38 @@
 #!/usr/bin/env bash
-#SBATCH --job-name="AAA.slurm"
-#SBATCH --output="AAA.slurm.slurmout"
-#SBATCH --error="AAA.slumerr"
+#SBATCH --job-name="com_pr_AAA.slurm"
+#SBATCH --output="pr_AAA.slurm.slurmout"
 #SBATCH --partition=gh
 #SBATCH --nodes=1
-#SBATCH --ntasks=24
-#SBATCH --time=2-00:00:00
+#SBATCH --ntasks-per-node=24
+#SBATCH --time=0-48:00:00
 
-source /work/10162/piskuliche/vista/Software/FE-Workflow/FE-Workflow.bashrc
-
-top=${PWD}
-endstates=(0.00000000 1.00000000)
 lams=CCC
-twostate=true
-eqstage=(init min1 min2 eqpre1P0 eqpre2P0 eqP0 eqNTP4 eqV eqP eqA eqProt2 eqProt1 eqProt05 eqProt025 eqProt01 eqProt0 minTI eqpre1P0TI eqpre2P0TI eqP0TI eqATI preTI)
-preminTIstage=eqProt0
-
+# check if AMBERHOME is set
+source ~/.bashrc
 
 ### CUDA MPS # BEGIN ###
-temp_path=/tmp/temp_${SLURM_JOB_ID}
+temp_path=/tmp/temp_com_AAA
 mkdir -p ${temp_path}
 export CUDA_MPS_PIPE_DIRECTORY=${temp_path}/nvidia-mps
 export CUDA_MPS_LOG_DIRECTORY=${temp_path}/nvidia-log
 nvidia-cuda-mps-control -d
 ### CUDA MPS # END ###
 
-# check if AMBERHOME is set
-#if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
+
+
+if [ -z "${AMBERHOME}" ]; then echo "AMBERHOME is not set" && exit 0; fi
 
 for trial in $(seq 1 1 3); do
-    echo "******** Working on Trial ${trial} ********"
-    #Copy the ATI files
-    if [ ${trial} -gt 1 ]; then
-        for lam in ${lams[@]};
-        do
-            cp t1/${lam}_preTI.rst7 t${trial}/${lam}_eqATI.rst7;
-        done
-    fi
-    # run production
-    EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
-    mpirun -np ${#lams[@]} ${EXE} -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile
-    echo "running replica ti"
-    mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
-    
-done
 
+	EXE=${AMBERHOME}/bin/pmemd.cuda.MPI
+	echo "running replica ti"
+	echo "mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog rem_pret${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile"
+	mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog rempret${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_preTI.groupfile
+	echo "mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile"
+	mpirun -np ${#lams[@]} ${EXE} -rem 3 -remlog remt${trial}.log -ng ${#lams[@]} -groupfile inputs/t${trial}_ti.groupfile
+
+done
 ### CUDA MPS # BEGIN ###
 echo quit | nvidia-cuda-mps-control
 ### CUDA MPS # END ###
+
