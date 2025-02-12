@@ -85,7 +85,7 @@ class Calculation:
                 for line in lines:
                     f.write(line)
 
-        print("To submit calculation, run: \n bash submit_runs.sh")
+        print(f"To submit calculation, run: \n bash {filename}")
         return
     
     def copy_edges(self, new_system, ntrials=1, nlambda=16):
