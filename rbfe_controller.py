@@ -831,7 +831,7 @@ if __name__ == "__main__":
         system = Calculation(args.modify)
         system.find_edges()
         system.write_calculation_submissions(args.aq, args.com, args.tag, nlambda=args.nlambda)
-        system.write_network_submission("submit_{args.tag}_{args.modify}.sh")
+        system.write_network_submission(f"submit_{args.tag}_{args.modify}.sh")
 
     if args.mode == "copy":
         if args.reference is None:
