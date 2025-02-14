@@ -574,7 +574,7 @@ class RMSRestraints:
                 for line in new_content:
                     f.write(line)
         # Modify Submit Scripts
-        for file in glob(f"{edge.com}/*.sh"):
+        for file in glob(f"{edge.com}/*.slurm"):
             with open(file, "r") as f:
                 content = f.readlines()
             new_content = []
