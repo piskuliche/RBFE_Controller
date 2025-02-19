@@ -595,11 +595,12 @@ class RMSRestraints:
             with open(f"restraints_{edge.system}.in", "r") as f:
                 restraints = f.readlines()
             for line in restraints:
-                line = line.split('=')[0]
-                for line2 in content:
-                    if line in line2:
-                        print("Removing line: ", line2)
-                        content.remove(line2)
+                if len(line.split("=")) > 1:
+                    line = line.split('=')[0]
+                    for line2 in content:
+                        if line in line2:
+                            print("Removing line: ", line2)
+                            content.remove(line2)
             
             with open(file, "w") as f:
                 for line in content:
