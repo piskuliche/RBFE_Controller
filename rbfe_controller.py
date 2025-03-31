@@ -856,7 +856,7 @@ if __name__ == "__main__":
         new_params = json.loads(args.new_parameters)
         system.change_all_params(which=args.change_parameters, new_params=new_params, endpoints_only=endpoints_only)
 
-    if args.mode =="rmsd":
+    if args.mode =="rmsd_calc":
         if args.reference is None:
             raise ValueError("Must provide a reference system for the RMSD restraints.")
         if args.modify is None:
@@ -866,6 +866,13 @@ if __name__ == "__main__":
         rmsd.GetAverageStructures()
         print("Combining Average Structures")
         rmsd.CombineAverageStructures()
+
+    if args.mode =="rmsd_apply":
+        if args.reference is None:
+            raise ValueError("Must provide a reference system for the RMSD restraints.")
+        if args.modify is None:
+            raise ValueError("Must provide a system to modify with RMSD restraints.")
+        rmsd = RMSRestraints(args.reference)
         print("Apply Reference Structures")
         rmsd.ApplyReferenceToSystem(args.modify)
     
