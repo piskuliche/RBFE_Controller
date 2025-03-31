@@ -823,7 +823,8 @@ if __name__ == "__main__":
         print("copy example: python rbfe_controller.py --modify system --mode copy --reference reference_system")
         print("update example: python rbfe_controller.py --modify system --mode update --change_parameters all --new_parameters '{\"nstlim\": 1000}'")
         print("update only endpoints example: python rbfe_controller.py --modify system --mode update --change_parameters all --new_parameters '{\"ntx\": 1000}' --endpoints_only True")
-        print("rmsd example: python rbfe_controller.py --modify system --mode rmsd --reference reference_system")
+        print("rmsd_calc example: python rbfe_controller.py --mode rmsd_calc --reference reference_system")
+        print("rmsd_apply example: python rbfe_controller.py --mode rmsd_calc --modify reference_system")
         print("analysis example: python rbfe_controller.py --reference system --mode analysis --output RBFE_Analysis --ntasks 56")
     
     if args.mode == "setup":
