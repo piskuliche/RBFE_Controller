@@ -860,8 +860,6 @@ if __name__ == "__main__":
     if args.mode =="rmsd_calc":
         if args.reference is None:
             raise ValueError("Must provide a reference system for the RMSD restraints.")
-        if args.modify is None:
-            raise ValueError("Must provide a system to modify with RMSD restraints.")
         rmsd = RMSRestraints(args.reference)
         print("Getting Average Structures")
         rmsd.GetAverageStructures()
@@ -869,8 +867,6 @@ if __name__ == "__main__":
         rmsd.CombineAverageStructures()
 
     if args.mode =="rmsd_apply":
-        if args.reference is None:
-            raise ValueError("Must provide a reference system for the RMSD restraints.")
         if args.modify is None:
             raise ValueError("Must provide a system to modify with RMSD restraints.")
         rmsd = RMSRestraints(args.reference)
