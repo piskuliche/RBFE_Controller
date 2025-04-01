@@ -866,7 +866,7 @@ if __name__ == "__main__":
     parser.add_argument("--endpoints_only",     default="False",                type=str, help="Only change the endpoints")
     parser.add_argument("--nlambda",           default=16,                      type=str, help="Optimize the lambda schedule")
     parser.add_argument("--distance",          default=6,                      type=int, help="The distance to use for the distance restraints")
-    parser.add_argumet("--usetraj",          default=False,                  type=bool, help="Use the trajectory files for the analysis")
+    parser.add_argument("--usetraj",          default=False,                  type=bool, help="Use the trajectory files for the analysis")
     args = parser.parse_args()
 
     if args.toolkit_bin is not None:
