@@ -512,6 +512,7 @@ class RMSRestraints:
         for edge in self.original_system.edges:
             av_tgt_lines.append(f"trajin {self.storage_dir}/av_tgt_{edge.name}.rst7\n")
         av_tgt_lines.append(f"autoimage\n")
+        av_tgt_lines.append(f"rms fit !:1,2,Na+,Cl-,WAT\n")
         av_tgt_lines.append(f"average {self.storage_dir}/av.rst7\n")
         av_tgt_lines.append("run\n")
         with open(self.inputs_dir / "av_tgt_step2.in", "w") as f:
