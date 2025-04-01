@@ -479,12 +479,13 @@ class RMSRestraints:
         The name of the original system
         
     """
-    def __init__(self, original_system, storage_dir="avRMSD"):
+    def __init__(self, original_system, storage_dir="avRMSD", usetraj=False):
         self.original_system = Calculation(original_system)
         self.original_system.find_edges()
         self.storage_dir = Path(storage_dir)
         self.inputs_dir = self.storage_dir/ "inputs"
         self.outputs_dir = self.storage_dir / "outputs"
+        self.usetraj = usetraj
         if not self.inputs_dir.exists():
             self.inputs_dir.mkdir(parents=True, exist_ok=True)
         if not self.outputs_dir.exists():
@@ -630,14 +631,18 @@ class RMSRestraints:
         tgt_lines, lig_lines, av_tgt_lines, av_lig_lines = [], [], [], []
         tgt_lines.append(f"parm {edge.com}/unisc.parm7\n")
         for lambda_value in edge.endpoints:
-            tgt_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_preTI.rst7\n")
+            tgt_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.rst7\n")
+        if self.usetraj:
+            tgt_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.nc\n")
         tgt_lines.append(f"average {self.storage_dir}/av_tgt_{edge.name}.rst7 '!:1,2'\n")
         tgt_lines.append("run\n")
 
         # Generate the ligand lines
         lig_lines.append(f"parm {edge.com}/unisc.parm7\n")
         for lambda_value in edge.endpoints:
-            lig_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_preTI.rst7\n")
+            lig_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.rst7\n")
+        if self.usetraj:
+            lig_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.nc\n")
         lig_lines.append(f"average {self.storage_dir}/av_lig_{edge.name}.rst7 ':1,2'\n")
         lig_lines.append("run\n")
 
