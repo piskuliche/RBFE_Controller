@@ -634,7 +634,7 @@ class RMSRestraints:
             tgt_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.rst7\n")
         if self.usetraj:
             tgt_lines.append(f"trajin {edge.com}/t1/{lambda_value:.8f}_ti.nc\n")
-        tgt_lines.append("rms fit !:1,2 & !:Na+,Cl-,WAT\n")
+        tgt_lines.append("rms fit !:1,2,Na+,Cl-,WAT\n")
         tgt_lines.append(f"average {self.storage_dir}/av_tgt_{edge.name}.rst7 '!:1,2'\n")
         tgt_lines.append("run\n")
 
