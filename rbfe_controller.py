@@ -549,6 +549,7 @@ class RMSRestraints:
             The name of the system to apply the reference structures to.
         
         """
+        print("Applying reference structures to system")
         new_system = Calculation(system)
         new_system.find_edges()
         for edge in new_system.edges:
@@ -592,7 +593,23 @@ class RMSRestraints:
             with open(file, "w") as f:
                 for line in new_content:
                     f.write(line)
-        # Modify MDIN Files
+
+        # Modify MDIN Files# Modify Submit Scripts
+        for file in glob(f"{edge.com}/*.pbs"):
+            with open(file, "r") as f:
+                content = f.readlines()
+            new_content = []
+            for line in content:
+                if "ref" in line:
+                    if "echo" in line: # This is a hack to avoid the echo line in the submit script losing a quote
+                        line = line.split("-ref")[0] + f'-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7"\n'
+                    else:
+                        line = line.split("-ref")[0] + f"-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7\n"
+                new_content.append(line)
+            with open(file, "w") as f:
+                for line in new_content:
+                    f.write(line)
+
         for file in glob(f"{edge.com}/inputs/*.mdin"):
             with open(file, "r") as f:
                 content = f.readlines()
