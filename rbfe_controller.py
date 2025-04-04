@@ -552,7 +552,6 @@ class RMSRestraints:
         print("Applying reference structures to system", system)
         new_system = Calculation(system)
         new_system.find_edges()
-        print(new_system.edges)
         for edge in new_system.edges:
             print(f"Applying reference to {edge.name}")
             self._apply_reference_to_edge(edge)
