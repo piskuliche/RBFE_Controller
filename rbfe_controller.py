@@ -482,6 +482,7 @@ class RMSRestraints:
     def __init__(self, original_system, storage_dir="avRMSD", usetraj=False):
         self.original_system = Calculation(original_system)
         self.original_system.find_edges()
+        print(self.original_system.edges)
         self.storage_dir = Path(storage_dir)
         self.inputs_dir = self.storage_dir/ "inputs"
         self.outputs_dir = self.storage_dir / "outputs"
