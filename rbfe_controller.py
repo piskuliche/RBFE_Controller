@@ -622,7 +622,7 @@ class RMSRestraints:
                         if line in line2:
                             print("Removing line: ", line2)
                             content.remove(line2)
-            
+        
             with open(file, "w") as f:
                 for line in content:
                     if "clambda" in line:
@@ -630,6 +630,30 @@ class RMSRestraints:
                             f.write(line2)
                         f.write("\n")
                     f.write(line)
+        
+        for file in glob(f"{edge.com}/inputs/*.mdin.template"):
+            with open(file, "r") as f:
+                content = f.readlines()
+            with open(f"restraints_{edge.system}.in", "r") as f:
+                restraints = f.readlines()
+            for line in restraints:
+                if len(line.split("=")) > 1:
+                    line = line.split('=')[0]
+                    for line2 in content:
+                        if line in line2:
+                            print("Removing line: ", line2)
+                            content.remove(line2)
+        
+            with open(file, "w") as f:
+                for line in content:
+                    if "clambda" in line:
+                        for line2 in restraints:
+                            f.write(line2)
+                        f.write("\n")
+                    f.write(line)
+
+
+        
 
     def _write_edge_ligand_lines(self, edge):
         """ Returns the lines for the edge-ligand restraint file 
