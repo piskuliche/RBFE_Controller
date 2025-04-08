@@ -567,7 +567,7 @@ class RMSRestraints:
         
         """
         # Modify Group Files
-        for file in glob(f"{edge.com}/inputs/*.groupfile"):
+        for file in glob(f"{edge.com}/inputs/*ti.groupfile"):
             with open(file, "r") as f:
                 content = f.readlines()
             new_content = []
@@ -578,6 +578,20 @@ class RMSRestraints:
             with open(file, "w") as f:
                 for line in new_content:
                     f.write(line)
+        """
+        # Modify Group Files
+        for file in glob(f"{edge.com}/inputs/*preTI.groupfile"):
+            with open(file, "r") as f:
+                content = f.readlines()
+            new_content = []
+            for line in content:
+                if "ref" in line:
+                    line = line.split("-ref")[0] + f"-ref ../../../../../{self.outputs_dir}/av_lig_tgt_{edge.name}.rst7\n"
+                new_content.append(line)
+            with open(file, "w") as f:
+                for line in new_content:
+                    f.write(line)
+
         # Modify Submit Scripts
         for file in glob(f"{edge.com}/*.slurm"):
             with open(file, "r") as f:
@@ -609,8 +623,9 @@ class RMSRestraints:
             with open(file, "w") as f:
                 for line in new_content:
                     f.write(line)
+        """
 
-        for file in glob(f"{edge.com}/inputs/*.mdin"):
+        for file in glob(f"{edge.com}/inputs/*preTI.mdin"):
             with open(file, "r") as f:
                 content = f.readlines()
             with open(f"restraints_{edge.system}.in", "r") as f:
@@ -631,7 +646,7 @@ class RMSRestraints:
                         f.write("\n")
                     f.write(line)
         
-        for file in glob(f"{edge.com}/inputs/*.mdin.template"):
+        for file in glob(f"{edge.com}/inputs/*ti.mdin"):
             with open(file, "r") as f:
                 content = f.readlines()
             with open(f"restraints_{edge.system}.in", "r") as f:
